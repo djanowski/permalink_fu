@@ -156,6 +156,14 @@ class MockModelExtra < BaseModel
   has_permalink [:title, :extra]
 end
 
+class ToSModel < BaseModel
+  has_permalink
+
+  def to_s
+    @title.to_s
+  end
+end
+
 class PermalinkFuTest < Test::Unit::TestCase
   @@samples = {
     'This IS a Tripped out title!!.!1  (well/ not really)' => 'this-is-a-tripped-out-title1-well-not-really',
@@ -317,6 +325,13 @@ class PermalinkFuTest < Test::Unit::TestCase
     @m.id = 1
     @m.validate
     assert_equal '1-my-param', @m.to_param
+  end
+
+  def test_should_rely_on_to_s_if_no_attr_given
+    @m = ToSModel.new
+    @m.title = 'Will rely on to_s'
+    @m.validate
+    assert_equal 'will-rely-on-to_s', @m.permalink
   end
   
 end

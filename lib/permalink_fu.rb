@@ -48,6 +48,7 @@ module PermalinkFu
     #   end
     #
     def has_permalink(attr_names = [], options = {})
+      attr_names = :to_s if attr_names.blank?
       self.permalink_attributes = Array(attr_names)
       self.permalink_field      = (options.delete(:as) || 'permalink').to_s
       self.permalink_options    = options
