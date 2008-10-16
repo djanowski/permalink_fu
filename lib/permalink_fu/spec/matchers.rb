@@ -28,6 +28,13 @@ module PermalinkFu
           end
       end
 
+      # Provides a matcher for nicer specs:
+      #   
+      #   describe Article do
+      #     it "has a permalink" do
+      #       Article.create(:title => 'Lorem ipsum').should permalink_to('lorem-ipsum')
+      #     end
+      #   end
       def permalink_to(*args)
         PermalinkTo.new(*args)
       end
