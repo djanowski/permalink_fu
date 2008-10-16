@@ -38,9 +38,16 @@ These methods keep their name no matter what attribute is used to store the perm
 
 The `find_by_permalink` method returns `nil` if there is no match; the `find_by_permalink!` method will raise `ActiveRecord::RecordNotFound`.
 
-You can override the model's `to_param` method with
+By default, this fork will override `ActiveRecord::Base#to_param` so that your controllers can still find your models without further work:
+    
+    article.to_param
+    # => "1-foo-bar"
 
-    has_permalink :title, :param => true
+You can change this behavior by using the `param` option:
+
+    has_permalink :title, :param => :permalink
+
+    has_permalink :title, :param => false
     
 This means that the permalink will be used instead of the primary key (id) in generated URLs. Remember to change your controller code from e.g. `find` to `find_by_permalink!`.
 

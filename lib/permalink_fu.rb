@@ -54,13 +54,27 @@ module PermalinkFu
       before_validation :create_unique_permalink
       evaluate_attribute_method permalink_field, "def #{self.permalink_field}=(new_value);write_attribute(:#{self.permalink_field}, PermalinkFu.escape(new_value));end", "#{self.permalink_field}="
       extend  PermalinkFinders
-      include ToParam if options[:param]
+
+      case options[:param]
+      when false
+        # nothing
+      when :permalink
+        include ToParam
+      else
+        include ToParamWithID
+      end
     end
   end
   
   module ToParam
     def to_param
       send(self.class.permalink_field)
+    end
+  end
+  
+  module ToParamWithID
+    def to_param
+      "#{id}-#{send(self.class.permalink_field)}"
     end
   end
   

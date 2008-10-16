@@ -117,7 +117,11 @@ class AsModel < BaseModel
 end
 
 class OverrideParamModel < BaseModel
-  has_permalink :title, :param => true
+  has_permalink :title, :param => :permalink
+end
+
+class NoParamModel < BaseModel
+  has_permalink :title, :param => false
 end
 
 class IfProcConditionModel < BaseModel
@@ -300,13 +304,19 @@ class PermalinkFuTest < Test::Unit::TestCase
     @m.permalink = 'My Param'
     @m.validate
     assert_equal 'my-param', @m.to_param
-  end
-  
-  def test_should_not_override_to_param_by_default
-    @m = MockModel.new
+    
+    @m = NoParamModel.new
     @m.permalink = 'My Param'
     @m.validate
     assert_not_equal 'my-param', @m.to_param
+  end
+  
+  def test_should_override_to_param_by_default
+    @m = MockModel.new
+    @m.permalink = 'My Param'
+    @m.id = 1
+    @m.validate
+    assert_equal '1-my-param', @m.to_param
   end
   
 end
