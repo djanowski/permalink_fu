@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name = 'permalink_fu'
-  s.version = '0.1.1'
+  s.version = '0.1.2'
   s.summary = %{ActiveRecord plugin for automatically converting fields to permalinks.}
   s.description = %{}
   s.date = %q{2008-10-16}
@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
 
   s.specification_version = 2 if s.respond_to? :specification_version=
 
-  s.files = ["lib/permalink_fu.rb", "init.rb", "README.markdown", "MIT-LICENSE", "Rakefile"]
+  s.files = ["lib/permalink_fu/spec/matchers.rb", "lib/permalink_fu.rb", "init.rb", "README.markdown", "MIT-LICENSE", "Rakefile"]
 
   s.require_paths = ['lib']
 
