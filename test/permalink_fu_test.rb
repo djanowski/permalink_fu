@@ -164,6 +164,14 @@ class ToSModel < BaseModel
   end
 end
 
+class OptionsWithoutAttrsModel < BaseModel
+  has_permalink :param => false
+
+  def to_s
+    @title.to_s
+  end
+end
+
 class PermalinkFuTest < Test::Unit::TestCase
   @@samples = {
     'This IS a Tripped out title!!.!1  (well/ not really)' => 'this-is-a-tripped-out-title1-well-not-really',
@@ -335,6 +343,11 @@ class PermalinkFuTest < Test::Unit::TestCase
 
   def test_should_rely_on_to_s_if_no_attr_given
     @m = ToSModel.new
+    @m.title = 'Will rely on to_s'
+    @m.validate
+    assert_equal 'will-rely-on-to_s', @m.permalink
+    
+    @m = OptionsWithoutAttrsModel.new
     @m.title = 'Will rely on to_s'
     @m.validate
     assert_equal 'will-rely-on-to_s', @m.permalink

@@ -47,8 +47,9 @@ module PermalinkFu
     #     has_permalink :title, :as => :slug, :scope => :blog_id
     #   end
     #
-    def has_permalink(attr_names = [], options = {})
-      attr_names = :to_s if attr_names.blank?
+    def has_permalink(*args)
+      options = args.extract_options!
+      attr_names = args.first || :to_s
       self.permalink_attributes = Array(attr_names)
       self.permalink_field      = (options.delete(:as) || 'permalink').to_s
       self.permalink_options    = options
