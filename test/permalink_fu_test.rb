@@ -325,6 +325,12 @@ class PermalinkFuTest < Test::Unit::TestCase
     @m.id = 1
     @m.validate
     assert_equal '1-my-param', @m.to_param
+    
+    @m = MockModel.new
+    @m.permalink = ''
+    @m.id = 1
+    @m.validate
+    assert_equal 1, @m.to_param
   end
 
   def test_should_rely_on_to_s_if_no_attr_given

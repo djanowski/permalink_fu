@@ -75,7 +75,9 @@ module PermalinkFu
   
   module ToParamWithID
     def to_param
-      "#{id}-#{send(self.class.permalink_field)}"
+      permalink = send(self.class.permalink_field)
+      return super if new_record? || permalink.blank?
+      "#{id}-#{permalink}"
     end
   end
   
