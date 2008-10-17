@@ -8,7 +8,13 @@ end
 module PermalinkFu
 
   def self.escape(str)
-    s = ActiveSupport::Multibyte::Handlers::UTF8Handler.normalize(str.to_s, :kd)
+    begin
+      s = ActiveSupport::Multibyte::Handlers::UTF8Handler.normalize(str.to_s, :kd)
+    rescue ActiveSupport::Multibyte::Handlers::EncodingError
+      require 'iconv'
+      s = Iconv.iconv('ascii//translit//IGNORE', 'utf-8', str).first.to_s
+    end
+
     s.gsub!(/[^\w -]+/n, '')  # strip unwanted characters
     s.strip! # ohh la la
     s.downcase!

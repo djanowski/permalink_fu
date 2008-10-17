@@ -204,7 +204,8 @@ class PermalinkFuTest < Test::Unit::TestCase
     'This IS a Tripped out title!!.!1  (well/ not really)' => 'this-is-a-tripped-out-title1-well-not-really',
     '////// meph1sto r0x ! \\\\\\' => 'meph1sto-r0x',
     'āčēģīķļņūö' => 'acegiklnuo',
-    '中文測試 chinese text' => 'chinese-text'
+    '中文測試 chinese text' => 'chinese-text',
+    "use what you\222ve got" => 'use-what-youve-got'
   }
 
   @@extra = { 'some-)()()-ExtRa!/// .data==?>    to \/\/test' => 'some-extra-data-to-test' }
@@ -400,5 +401,5 @@ class PermalinkFuTest < Test::Unit::TestCase
     @m.validate
     assert_equal 'overriding', @m.permalink
   end
-  
+
 end
