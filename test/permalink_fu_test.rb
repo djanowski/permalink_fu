@@ -1,5 +1,6 @@
 require 'test/unit'
 require File.join(File.dirname(__FILE__), '../lib/permalink_fu')
+require 'active_support/core_ext/class'
 
 class FauxColumn < Struct.new(:limit)
 end
@@ -21,9 +22,7 @@ class BaseModel
   attr_reader   :permalink
   attr_accessor :foo
 
-  class << self
-    attr_accessor :validation
-  end
+  cattr_accessor :validation
   
   def self.generated_methods
     @generated_methods ||= []
@@ -169,6 +168,21 @@ class OptionsWithoutAttrsModel < BaseModel
 
   def to_s
     @title.to_s
+  end
+end
+
+class ParentModel < BaseModel
+  has_permalink :title
+end
+
+class ChildModel < ParentModel
+end
+
+class ChildModelOverriding < ParentModel
+  has_permalink
+
+  def to_s
+    'overriding'
   end
 end
 
@@ -351,6 +365,18 @@ class PermalinkFuTest < Test::Unit::TestCase
     @m.title = 'Will rely on to_s'
     @m.validate
     assert_equal 'will-rely-on-to_s', @m.permalink
+  end
+
+  def test_should_work_with_sti
+    @m = ChildModel.new
+    @m.title = 'This is a child'
+    @m.validate
+    assert_equal 'this-is-a-child', @m.permalink
+    
+    @m = ChildModelOverriding.new
+    @m.title = 'This is a child'
+    @m.validate
+    assert_equal 'overriding', @m.permalink
   end
   
 end

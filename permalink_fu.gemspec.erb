@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name = 'permalink_fu'
-  s.version = '0.1.2'
+  s.version = '0.1.3'
   s.summary = %{ActiveRecord plugin for automatically converting fields to permalinks.}
   s.description = %{}
   s.date = %q{2008-10-16}

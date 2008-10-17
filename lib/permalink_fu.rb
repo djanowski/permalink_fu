@@ -18,11 +18,6 @@ module PermalinkFu
   
   def self.included(base)
     base.extend ClassMethods
-    class << base
-      attr_accessor :permalink_options
-      attr_accessor :permalink_attributes
-      attr_accessor :permalink_field
-    end
   end
   
   module ClassMethods
@@ -50,9 +45,14 @@ module PermalinkFu
     def has_permalink(*args)
       options = args.extract_options!
       attr_names = args.first || :to_s
-      self.permalink_attributes = Array(attr_names)
-      self.permalink_field      = (options.delete(:as) || 'permalink').to_s
-      self.permalink_options    = options
+      write_inheritable_attribute(:permalink_attributes,  Array(attr_names))
+      write_inheritable_attribute(:permalink_field,       (options.delete(:as) || 'permalink').to_s)
+      write_inheritable_attribute(:permalink_options,     options)
+
+      %w{permalink_attributes permalink_field permalink_options}.each do |v|
+        class_inheritable_reader(v.to_sym)
+      end
+
       before_validation :create_unique_permalink
       evaluate_attribute_method permalink_field, "def #{self.permalink_field}=(new_value);write_attribute(:#{self.permalink_field}, PermalinkFu.escape(new_value));end", "#{self.permalink_field}="
       extend  PermalinkFinders
@@ -70,13 +70,13 @@ module PermalinkFu
   
   module ToParam
     def to_param
-      send(self.class.permalink_field)
+      send(self.class.read_inheritable_attribute(:permalink_field))
     end
   end
   
   module ToParamWithID
     def to_param
-      permalink = send(self.class.permalink_field)
+      permalink = send(self.class.read_inheritable_attribute(:permalink_field))
       return super if new_record? || permalink.blank?
       "#{id}-#{permalink}"
     end
@@ -96,26 +96,27 @@ module PermalinkFu
 protected
   def create_unique_permalink
     return unless should_create_permalink?
-    if send(self.class.permalink_field).to_s.empty?
-      send("#{self.class.permalink_field}=", create_permalink_for(self.class.permalink_attributes))
+    if send(self.class.read_inheritable_attribute(:permalink_field)).to_s.empty?
+      send("#{self.class.read_inheritable_attribute(:permalink_field)}=", create_permalink_for(self.class.read_inheritable_attribute(:permalink_attributes)))
     end
-    limit   = self.class.columns_hash[self.class.permalink_field].limit
-    base    = send("#{self.class.permalink_field}=", send(self.class.permalink_field)[0..limit - 1])
+    limit   = self.class.columns_hash[self.class.read_inheritable_attribute(:permalink_field)].limit
+    base    = send("#{self.class.read_inheritable_attribute(:permalink_field)}=", 
+                   send(self.class.read_inheritable_attribute(:permalink_field))[0..limit - 1])
     counter = 1
     # oh how i wish i could use a hash for conditions
-    conditions = ["#{self.class.permalink_field} = ?", base]
+    conditions = ["#{self.class.read_inheritable_attribute(:permalink_field)} = ?", base]
     unless new_record?
       conditions.first << " and id != ?"
       conditions       << id
     end
-    if self.class.permalink_options[:scope]
-      conditions.first << " and #{self.class.permalink_options[:scope]} = ?"
-      conditions       << send(self.class.permalink_options[:scope])
+    if self.class.read_inheritable_attribute(:permalink_options)[:scope]
+      conditions.first << " and #{self.class.read_inheritable_attribute(:permalink_options)[:scope]} = ?"
+      conditions       << send(self.class.read_inheritable_attribute(:permalink_options)[:scope])
     end
     while self.class.exists?(conditions)
       suffix = "-#{counter += 1}"
       conditions[1] = "#{base[0..limit-suffix.size-1]}#{suffix}"
-      send("#{self.class.permalink_field}=", conditions[1])
+      send("#{self.class.read_inheritable_attribute(:permalink_field)}=", conditions[1])
     end
   end
 
@@ -125,10 +126,10 @@ protected
 
 private
   def should_create_permalink?
-    if self.class.permalink_options[:if]
-      evaluate_method(self.class.permalink_options[:if])
-    elsif self.class.permalink_options[:unless]
-      !evaluate_method(self.class.permalink_options[:unless])
+    if self.class.read_inheritable_attribute(:permalink_options)[:if]
+      evaluate_method(self.class.read_inheritable_attribute(:permalink_options)[:if])
+    elsif self.class.read_inheritable_attribute(:permalink_options)[:unless]
+      !evaluate_method(self.class.read_inheritable_attribute(:permalink_options)[:unless])
     else
       true
     end
