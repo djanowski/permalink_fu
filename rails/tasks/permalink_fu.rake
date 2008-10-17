@@ -11,6 +11,11 @@ namespace :permalinks do
     models.each do |model|
       next unless model.respond_to?(:permalink_field)
 
+      if model.permalink_options.include?(:param)
+        puts "Skipping #{model} because it doesn't include the ID in #to_param."
+        next
+      end
+
       field = model.permalink_field
 
       objects = nil

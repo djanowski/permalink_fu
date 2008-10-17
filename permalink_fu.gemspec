@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
 
   s.specification_version = 2 if s.respond_to? :specification_version=
 
-  s.files = ["lib/permalink_fu/rake/tasks.rb", "lib/permalink_fu/spec/matchers.rb", "lib/permalink_fu.rb", "rails/tasks/permalink_fu.rake", "init.rb", "README.markdown", "MIT-LICENSE", "Rakefile"]
+  s.files = ["lib/permalink_fu/rake/tasks.rb", "lib/permalink_fu/spec/matchers.rb", "lib/permalink_fu/spec.rb", "lib/permalink_fu.rb", "rails/tasks/permalink_fu.rake", "init.rb", "README.markdown", "MIT-LICENSE", "Rakefile"]
 
   s.require_paths = ['lib']
 
@@ -17,3 +17,4 @@ Gem::Specification.new do |s|
   s.has_rdoc = false
   s.rdoc_options = ["--line-numbers", "--inline-source", "--title", "permalink_fu", "--main", "README.textile"]
 end
+
