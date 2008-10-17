@@ -98,6 +98,19 @@ class MockModel < BaseModel
   has_permalink :title
 end
 
+class MockModelUnique < BaseModel
+  def self.exists?(conditions)
+    if conditions[1] == 'foo'   || conditions[1] == 'bar' || 
+      (conditions[1] == 'bar-2' && conditions[2] != 2)
+      true
+    else
+      false
+    end
+  end
+
+  has_permalink :title, :param => :permalink
+end
+
 class ScopedModel < BaseModel
   def self.exists?(conditions)
     if conditions[1] == 'foo' && conditions[2] != 5
@@ -107,7 +120,7 @@ class ScopedModel < BaseModel
     end
   end
 
-  has_permalink :title, :scope => :foo
+  has_permalink :title, :scope => :foo, :param => :permalink
 end
 
 class AsModel < BaseModel
@@ -220,8 +233,17 @@ class PermalinkFuTest < Test::Unit::TestCase
     end
   end
   
-  def test_should_create_unique_permalink
+  def test_should_create_unique_permalink_only_when_param_equals_permalink
     @m = MockModel.new
+    @m.permalink = 'foo'
+    @m.validate
+    assert_equal 'foo', @m.permalink
+    
+    @m.permalink = 'bar'
+    @m.validate
+    assert_equal 'bar', @m.permalink
+    
+    @m = MockModelUnique.new
     @m.permalink = 'foo'
     @m.validate
     assert_equal 'foo-2', @m.permalink
@@ -232,7 +254,7 @@ class PermalinkFuTest < Test::Unit::TestCase
   end
   
   def test_should_not_check_itself_for_unique_permalink
-    @m = MockModel.new
+    @m = MockModelUnique.new
     @m.id = 2
     @m.permalink = 'bar-2'
     @m.validate
@@ -262,13 +284,13 @@ class PermalinkFuTest < Test::Unit::TestCase
   end
   
   def test_should_limit_unique_permalink
-    @old = MockModel.columns_hash['permalink'].limit
-    MockModel.columns_hash['permalink'].limit = 3
-    @m   = MockModel.new
+    @old = MockModelUnique.columns_hash['permalink'].limit
+    MockModelUnique.columns_hash['permalink'].limit = 3
+    @m   = MockModelUnique.new
     @m.title = 'foo'
     assert_equal 'f-2', @m.validate
   ensure
-    MockModel.columns_hash['permalink'].limit = @old
+    MockModelUnique.columns_hash['permalink'].limit = @old
   end
   
   def test_should_use_custom_field

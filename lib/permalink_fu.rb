@@ -99,9 +99,13 @@ protected
     if send(self.class.read_inheritable_attribute(:permalink_field)).to_s.empty?
       send("#{self.class.read_inheritable_attribute(:permalink_field)}=", create_permalink_for(self.class.read_inheritable_attribute(:permalink_attributes)))
     end
+    
     limit   = self.class.columns_hash[self.class.read_inheritable_attribute(:permalink_field)].limit
     base    = send("#{self.class.read_inheritable_attribute(:permalink_field)}=", 
                    send(self.class.read_inheritable_attribute(:permalink_field))[0..limit - 1])
+    
+    return unless self.class.read_inheritable_attribute(:permalink_options)[:param]
+
     counter = 1
     # oh how i wish i could use a hash for conditions
     conditions = ["#{self.class.read_inheritable_attribute(:permalink_field)} = ?", base]
@@ -118,6 +122,7 @@ protected
       conditions[1] = "#{base[0..limit-suffix.size-1]}#{suffix}"
       send("#{self.class.read_inheritable_attribute(:permalink_field)}=", conditions[1])
     end
+    send("#{self.class.read_inheritable_attribute(:permalink_field)}")
   end
 
   def create_permalink_for(attr_names)
