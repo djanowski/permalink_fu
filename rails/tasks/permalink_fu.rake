@@ -19,9 +19,10 @@ namespace :permalinks do
         objects = model.find(:all, :conditions => {:permalink => nil}, :limit => 20)
 
         objects.each do |o|
+          puts "#{model} #{o.id}"
           o.send(:create_unique_permalink)
           value = o.send(model.permalink_field)
-          puts "#{model} #{o.id} => #{value.inspect}"
+          puts "=> #{value.inspect}"
           model.update_all("#{field} = '#{value}'", "id = #{o.id}")
         end
       end
